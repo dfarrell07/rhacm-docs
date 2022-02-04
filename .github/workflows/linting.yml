@@ -1,0 +1,19 @@
+---
+name: Linting
+
+on:
+  pull_request:
+
+jobs:
+  asciidoc:
+    name: 'Build ASCIIDocs '
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+      - name: Build each .adoc with ASCIIDoctor, fail on any issue
+        run: |
+          for doc in $(find $(pwd) -name '*.adoc' -printf "%P\n"); do
+            echo "Bulding $doc"
+            docker run -v $(pwd):/rhacm-docs/ asciidoctor/docker-asciidoctor asciidoctor --failure-level ERROR --trace --verbose --warnings /rhacm-docs/$doc
+          done
