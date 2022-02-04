@@ -16,5 +16,5 @@ jobs:
           for doc in $(find $(pwd) -name '*.adoc' -printf "%P\n"); do
             echo "Bulding $doc"
             docker run -v $(pwd):/rhacm-docs/ asciidoctor/docker-asciidoctor@sha256:59a7e165ed6375dd5dfb930cb90019f1ccaee39787dc97a3918d7022a7503543 \
-              asciidoctor --failure-level WARN --trace --verbose --warnings /rhacm-docs/$doc
+              asciidoctor --failure-level INFO --trace --verbose --warnings /rhacm-docs/$doc
           done
