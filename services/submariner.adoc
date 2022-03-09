@@ -9,7 +9,6 @@ You can enable Submariner on {ocp-short} clusters that are hosted in the followi
 * Google Cloud Platform (GCP)
 * IBM Cloud
 * Microsoft Azure
-* Red Hat OpenShift Dedicated
 * VMware vSphere
 
 {product-title} provides a Submariner component that you can deploy in your environment by using your hub cluster.
@@ -18,7 +17,6 @@ You can enable Submariner on {ocp-short} clusters that are hosted in the followi
 * <<preparing-selected-hosts-to-deploy-submariner,Preparing selected hosts to deploy Submariner>>
 ** <<preparing-azure,Preparing Microsoft Azure to deploy Submariner>>
 ** <<preparing-ibm,Preparing IBM Cloud to deploy Submariner>>
-** <<preparing-osd,Preparing Red Hat OpenShift Dedicated to deploy Submariner>>
 
 [#submariner-prereq]
 == Prerequisites
@@ -57,7 +55,7 @@ See https://submariner.io/getting-started/#prerequisites[Submariner's upstream p
 [#preparing-selected-hosts-to-deploy-submariner]
 == Preparing selected hosts to deploy Submariner
 
-Before you deploy Submariner with {product-title} on Microsoft Azure, IBM Cloud, or Red Hat OpenShift Dedicated, you must manually prepare the clusters on the hosting environment for the connection. The requirements are different for different hosting environments, so follow the instructions for your hosting environment.
+Before you deploy Submariner with {product-title} on Microsoft Azure or IBM Cloud, you must manually prepare the clusters on the hosting environment for the connection. The requirements are different for different hosting environments, so follow the instructions for your hosting environment.
 
 [#preparing-azure]
 === Preparing Microsoft Azure to deploy Submariner
@@ -202,31 +200,3 @@ To configure the ROKS clusters on a VPC to use Submariner, complete the steps in
 . Label a node that has the public gateway as `submariner.io/gateway=true` in the cluster.
 
 . Refer to https://submariner.io/operations/deployment/calico/[Calico] to configure Calico CNI by creating IPPools in the cluster.
-
-[#preparing-osd]
-=== Preparing Red Hat OpenShift Dedicated to deploy Submariner
-
-Red Hat OpenShift Dedicated supports clusters that were provisioned by AWS and Google Cloud Platform.
-
-[#preparing-osd-aws]
-==== Preparing Red Hat OpenShift Dedicated to deploy Submariner on AWS
-
-To configure the AWS clusters on Red Hat OpenShift Dedicated, complete the following steps:
-
-. Submit a https://issues.redhat.com/secure/CreateIssue!default.jspa[support ticket] to the Red Hat OpenShift Hosted SRE Support team to grant `cluster-admin` group access to the Red Hat OpenShift Dedicated cluster. The default access of `dedicated-admin` does not have the permission that is required the create a `MachineSet`.
-
-. After the group is created, add the user name to the `cluster-admin` group that you created by completing the steps in https://docs.openshift.com/dedicated/4/administering_a_cluster/cluster-admin-role.html[Granting the cluster-admin role to users] in the Red Hat OpenShift Dedicated documentation.
-
-. Configure the credentials of the user `osdCcsAdmin`, so you can use that as a service account.
-
-. Import your cluster to {product-title-short}, and follow the instructions in xref:../services/deploy_submariner#deploying-submariner-console[Deploying Submariner with the console].
-
-[#preparing-osd-gcp]
-==== Preparing Red Hat OpenShift Dedicated to deploy Submariner on Google Cloud Platform
-
-To configure the Google Cloud Platform clusters on Red Hat OpenShift Dedicated, complete the following steps:
-
-. Configure a service account named `osd-ccs-admin` that you can use to manage the deployment.
-
-. Import your cluster to {product-title-short}, and follow the instructions in xref:../services/deploy_submariner.adoc#deploying-submariner-console[Deploying Submariner with the console].
-
