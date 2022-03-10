@@ -1,7 +1,5 @@
 [#submariner]
-= Submariner networking service (Technology Preview)
-
-The `submariner-addon` component is a *Technology Preview* feature.
+= Submariner networking service
 
 The _Submariner_ service is an open source tool that can be used with {product-title} to provide direct networking between pods across two or more Kubernetes clusters in your environment, either on-premises or in the cloud. For more information about Submariner, see https://submariner.io/[Submariner's website].
 
@@ -11,7 +9,6 @@ You can enable Submariner on {ocp-short} clusters that are hosted in the followi
 * Google Cloud Platform (GCP)
 * IBM Cloud
 * Microsoft Azure
-* Red Hat OpenShift Dedicated
 * VMware vSphere
 
 {product-title} provides a Submariner component that you can deploy in your environment by using your hub cluster.
@@ -20,24 +17,17 @@ You can enable Submariner on {ocp-short} clusters that are hosted in the followi
 * <<preparing-selected-hosts-to-deploy-submariner,Preparing selected hosts to deploy Submariner>>
 ** <<preparing-azure,Preparing Microsoft Azure to deploy Submariner>>
 ** <<preparing-ibm,Preparing IBM Cloud to deploy Submariner>>
-** <<preparing-osd,Preparing Red Hat OpenShift Dedicated to deploy Submariner>>
 
 [#submariner-prereq]
 == Prerequisites
 
 Ensure that you have the following prerequisites before using Submariner:
 
-* A {product-title-short} hub cluster that is running on {ocp} version 4.6, or later, with Kubernetes version 1.19, or later.
-* A credential to access the hub cluster with `cluster-admin` permissions.
-* Two or more {ocp-short} managed clusters that are running on {ocp-short} version 4.4, or later, with Kubernetes version 1.17, or later, and are managed by the {product-title-short} hub cluster.
-* Non-overlapping pod and service Classless Inter-Domain Routing (CIDR) ranges for clusters. **Note:** The upstream feature called _Globalnet_ allows overlapping CIDRs, but it is not currently supported for use with {product-title-short}.
-* IP connectivity must be configured between the Gateway nodes. When connecting two clusters, at least one of the clusters must be accessible to the Gateway node using its public or private IP address designated to the Gateway node. See https://submariner.io/operations/nat-traversal[Submariner NAT Traversal] for more information.
-* Firewall configuration across all nodes in each of the managed clusters must allow 4800/UDP in both directions.
-* Firewall configuration on the Gateway nodes must allow ingress 8080/TCP so the other nodes in the cluster can access it.
-* Firewall configuration open for 4500/UDP and any other ports that are used for IPsec traffic on the gateway nodes.
-+
-*Note:* This is configured automatically when your clusters are deployed in an AWS or GCP environment, but must be configured manually for clusters on other environments and for the firewalls that protect private clouds.
-+
+* At least two cluters.
+* Credentials to access the hub cluster with `cluster-admin` permissions.
+* IP connectivity between Gateway nodes. When connecting two clusters, at least one of the clusters must be accessible to the Gateway node of the other.
+	See https://submariner.io/operations/nat-traversal[Submariner NAT Traversal] for more information.
+
 .Submariner required ports
 |===
 | Name | Default value | Customizable
@@ -60,7 +50,7 @@ See https://submariner.io/getting-started/#prerequisites[Submariner's upstream p
 [#preparing-selected-hosts-to-deploy-submariner]
 == Preparing selected hosts to deploy Submariner
 
-Before you deploy Submariner with {product-title} on Microsoft Azure, IBM Cloud, or Red Hat OpenShift Dedicated, you must manually prepare the clusters on the hosting environment for the connection. The requirements are different for different hosting environments, so follow the instructions for your hosting environment.
+Before you deploy Submariner with {product-title} on Microsoft Azure or IBM Cloud, you must manually prepare the clusters on the hosting environment for the connection. The requirements are different for different hosting environments, so follow the instructions for your hosting environment.
 
 [#preparing-azure]
 === Preparing Microsoft Azure to deploy Submariner
@@ -206,30 +196,254 @@ To configure the ROKS clusters on a VPC to use Submariner, complete the steps in
 
 . Refer to https://submariner.io/operations/deployment/calico/[Calico] to configure Calico CNI by creating IPPools in the cluster.
 
-[#preparing-osd]
-=== Preparing Red Hat OpenShift Dedicated to deploy Submariner
+[#deploying-submariner-console]
+== Deploying Submariner with the console
 
-Red Hat OpenShift Dedicated supports clusters that were provisioned by AWS and Google Cloud Platform.
+You can deploy Submariner on {ocp} managed clusters that are deployed on Amazon Web Services, Google Cloud Platform, and VMware vSphere by using the {product-title} console. To deploy Submariner on other providers, follow the instructions in <<deploying-submariner-manually,Deploying Submariner with Manually>>. Complete the following steps to deploy Submariner with the {product-title} console:
 
-[#preparing-osd-aws]
-==== Preparing Red Hat OpenShift Dedicated to deploy Submariner on AWS
+*Required access:* Cluster administrator
 
-To configure the AWS clusters on Red Hat OpenShift Dedicated, complete the following steps:
+. From the console navigation menu, select *Infrastructure* > *Clusters*.
 
-. Submit a https://issues.redhat.com/secure/CreateIssue!default.jspa[support ticket] to the Red Hat OpenShift Hosted SRE Support team to grant `cluster-admin` group access to the Red Hat OpenShift Dedicated cluster. The default access of `dedicated-admin` does not have the permission that is required the create a `MachineSet`.
+. On the _Clusters_ page, select the _Cluster sets_ tab. The clusters that you want enable with Submariner must be in the same cluster set. 
 
-. After the group is created, add the user name to the `cluster-admin` group that you created by completing the steps in https://docs.openshift.com/dedicated/4/administering_a_cluster/cluster-admin-role.html[Granting the cluster-admin role to users] in the Red Hat OpenShift Dedicated documentation.
+. If the clusters on which you want to deploy Submariner are already in the same cluster set, skip to step 5 to deploy Submariner.
 
-. Configure the credentials of the user `osdCcsAdmin`, so you can use that as a service account.
+. If the clusters on which you want to deploy Submariner are not in the same cluster set, create a cluster set for them by completing the following steps: 
 
-. Import your cluster to {product-title-short}, and follow the instructions in xref:../services/deploy_submariner#deploying-submariner-console[Deploying Submariner with the console].
+.. Select *Create cluster set*.
 
-[#preparing-osd-gcp]
-==== Preparing Red Hat OpenShift Dedicated to deploy Submariner on Google Cloud Platform
+.. Name the cluster set, and select *Create*.
 
-To configure the Google Cloud Platform clusters on Red Hat OpenShift Dedicated, complete the following steps:
+.. Select *Manage resource assignments* to assign clusters to the cluster set.
 
-. Configure a service account named `osd-ccs-admin` that you can use to manage the deployment.
+.. Select the managed clusters that you want to connect with Submariner to add them to the cluster set.
 
-. Import your cluster to {product-title-short}, and follow the instructions in xref:../services/deploy_submariner.adoc#deploying-submariner-console[Deploying Submariner with the console].
+.. Select *Review* to view and confirm the clusters that you selected.
 
+.. Select *Save* to save the cluster set, and view the resulting cluster set page.
+
+. On the cluster set page, select the _Submariner add-ons_ tab.
+
+. Select *Install Submariner add-ons*.
+
+. Select the clusters on which you want to deploy Submariner. 
+
+. Enter the following information in the _Install Submariner add-ons_ editor:
++
+* `AWS Access Key ID` - This field is only visible when you import an AWS cluster.
+* `AWS Secret Access Key` - This field is only visible when you import an AWS cluster.
+* `Google Cloud Platform service account JSON key` - This field is only visible when you import a Google Cloud Platform cluster.
+* `Instance type` - The Amazon Web Services EC2 instance type of the gateway node that is created on the managed cluster. The default value is `c5d.large`. This field is only visible when your managed cluster environment is AWS.
+* `IPsec NAT-T port` - The default value for the IPsec NAT traversal port is port `4500`. If your managed cluster environment is VMware vSphere, ensure that this port is opened on your firewalls.
+* `Gateway count` - The number of worker nodes that are used to deploy the Submariner gateway component on your managed cluster. The default value is `1`. If the value is greater than 1, the Submariner gateway High Availability (HA) is automatically enabled.
+* `Cable driver` - The Submariner gateway cable engine component that maintains the cross-cluster tunnels. The default value is `Libreswan IPsec`.
+
+. Select *Next* at the end of the editor to move to the editor for the next cluster, and complete the editor for each of the remaining clusters that you selected. 
+
+. Verify your configuration for each managed cluster.
+
+. Click *Install* to deploy Submariner on the selected managed clusters. 
++
+It might take several minutes for the installation and configuration to complete. You can check the Submariner status in the list on the _Submariner add-ons_ tab:
++
+* `Connection status` indicates how many Submariner connections are established on the managed cluster. 
++
+* `Agent status` indicates whether Submariner is successfully deployed on the managed cluster. The console might report a status of `Degraded` until it is installed and configured. 
++
+* `Gateway nodes labeled` indicates how many worker nodes are labeled with the Submariner gateway label: `submariner.io/gateway=true` on the managed cluster.
+
+Submariner is now deployed on the clusters.
+
+[#deploying-submariner-manually]
+== Deploying Submariner with Manually
+
+Before you deploy Submariner with {product-title}, you must prepare the clusters on the hosting environment for the connection. Currently, you can use the `SubmarinerConfig` API to automatically prepare the clusters on Amazon Web Services, Google Cloud Platform and VMware vSphere. For other platforms, you need to prepare them manually, see <<preparing-the-hosts-to-deploy-submariner,Preparing the hosts to deploy Submariner>> for the steps.
+
+[#preparing-the-hosts-to-deploy-submariner]
+=== Preparing the hosts to deploy Submariner
+
+Before you deploy Submariner with {product-title-short}, you must prepare the clusters on the hosting environment for the connection. The requirements vary for different hosting environments, so follow the instructions for your hosting environment.
+
+[#preparing-vm]
+==== Preparing to deploy Submariner on VMware vSphere
+
+Submariner uses IPsec to establish the secure tunnels between the clusters on the gateway nodes. You can use the default port or specify a custom port. When you run this procedure without specifying an IPsec NATT port, the default port is automatically used for the communication. The default port is 4500/UDP. 
+
+Submariner uses virtual extensible LAN (VXLAN) to encapsulate traffic when it moves from the worker and master nodes to the gateway nodes. The VXLAN port cannot be customized, and is always port 4800/UDP.
+
+Submariner uses 8080/TCP to send its metrics information among nodes in the cluster, this port cannot be customized.
+
+The following ports must be opened by your VMWare vSphere administrator before you can enable Submariner:
+
+.VMware vSphere and Submariner ports
+|===
+| Name | Default value | Customizable 
+
+| IPsec NATT
+| 4500/UDP
+| Yes
+
+| VXLAN
+| 4800/UDP
+| No
+
+| Submariner metrics
+| 8080/TCP
+| No
+|===
+
+To prepare VMware vSphere clusters for deploying Submariner, complete the following steps:
+
+. Ensure that the IPsec NATT, VXLAN, and metrics ports are open.
+
+. Enter a command that contains information that is similar to the following example to apply the YAML sample. Run the command to apply the file:
+
++
+----
+cat << EOF | oc apply -f -
+----
++
+[source,yaml]
+----
+apiVersion: submarineraddon.open-cluster-management.io/v1alpha1
+kind: SubmarinerConfig
+metadata:
+    name: submariner
+    namespace: <managed-cluster-namespace>
+spec:{}
+EOF
+----
++
+Replace `managed-cluster-namespace` with the namespace of your managed cluster.
++
+*Note:* The name of the `SubmarinerConfig` must be `submariner`, as shown in the example.
++
+This configuration uses the default NATT port (4500/UDP) for Submariner. One worker node is labeled as the Submariner gateway on your vSphere cluster.
++
+Submariner uses IPsec to establish the secure tunnels between the clusters on the gateway nodes. You can either use the default IPsec NATT port, or you can specify a different port that you configured. When you run this procedure without specifying an IPsec NATT port of 4500/UDP is automatically used for the communication.
++
+* If you want to customize your NATT port, enter a command that contains information that is similar to the following example. Run the command to apply the file:
+
++
+----
+cat << EOF | oc apply -f -
+----
+
++
+[source,yaml]
+----
+apiVersion: submarineraddon.open-cluster-management.io/v1alpha1
+kind: SubmarinerConfig
+metadata:
+    name: submariner
+    namespace: <managed-cluster-namespace>
+spec:
+    IPSecNATTPort: <NATTPort>
+EOF
+----
++
+Replace `managed-cluster-namespace` with the namespace of your managed cluster.
++
+Replace `NATTPort` with the NATT port that you want to use.
++
+*Note:* The name of the `SubmarinerConfig` must be `submariner`, as shown in the example.
+
+* If you want to customize the number of your gateway nodes, enter a command that contains information that is similar to the following example. Run the command to apply the file:
++
+----
+cat << EOF | oc apply -f -
+----
++
+[source,yaml]
+----
+apiVersion: submarineraddon.open-cluster-management.io/v1alpha1
+kind: SubmarinerConfig
+metadata:
+   name: submariner
+   namespace: <managed-cluster-namespace>
+spec:
+  gatewayConfig:
+      gateways: <gateways>
+EOF
+----
++
+Replace `managed-cluster-namespace` with the namespace of your managed cluster.
++
+Replace `gateways` with the number of gateways that you want to use. If the value is greater than 1, the Submariner gateway automatically enables high availability.
+
+[#deploying-submariner-mcaddon-api]
+=== Deploy Submariner with the ManagedClusterAddOn API
+
+To deploy Submariner by using the `ManagedClusterAddOn` API, complete the following steps:
+
+. Create a `ManagedClusterSet` on the hub cluster by using the instructions provided in link:../clusters/managedclustersets.adoc#managedclustersets[Creating and managing ManagedClusterSets]. Your entry for the `ManagedClusterSet` should resemble the following content:
+
++
+[source,yaml]
+----   
+apiVersion: cluster.open-cluster-management.io/v1alpha1
+kind: ManagedClusterSet
+metadata:
+  name: <managed-cluster-set-name>
+----
++
+Replace `managed-cluster-set-name` with a name for the `ManagedClusterSet` that you are creating.
++
+*Note:* The maximum length of the name of the Kubernetes namespace is 63 characters, so the maximum length of the `<managed-cluster-set-name>` is 56 characters. If the length of `<managed-cluster-set-name>` exceeds 56, the `<managed-cluster-set-name>` is truncated from the head.
++
+After the `ManagedClusterSet` is created, the `submariner-addon` creates a namespace called `<managed-cluster-set-name>-broker` and deploys the Submariner broker to it.
+
+. Add one managed cluster to the `ManagedClusterSet` by entering the following command:
++
+----
+oc label managedclusters <managed-cluster-name> "cluster.open-cluster-management.io/clusterset=<managed-cluster-set-name>" --overwrite
+----
++
+Replace `<managed-cluster-name>` with the name of the managed cluster that you want to add to the `ManagedClusterSet`.
++
+Replace `<managed-cluster-set-name>` with the name of the `ManagedClusterSet` to which you want to add the managed cluster. 
+
+.  Deploy Submariner on the managed cluster by entering the following command:
+
++
+----
+cat << EOF | oc apply -f -
+----
+
++
+[source,yaml]
+----
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: ManagedClusterAddOn
+metadata:
+     name: submariner
+     namespace: <managed-cluster-name>
+spec:
+     installNamespace: submariner-operator
+EOF
+----
++
+Replace `managed-cluster-name` with the name of the managed cluster that you want to use with Submariner. 
++
+The `installNamespace` field in the spec of the `ManagedClusterAddOn` is the namespace on the managed cluster where it installs Submariner. Currently, Submariner must be installed in the `submariner-operator` namespace.
++
+After the `ManagedClusterAddOn` is created, the `submariner-addon` deploys Submariner to the `submariner-operator` namespace on the managed cluster. You can view the deployment status of Submariner from the status of this `ManagedClusterAddOn`.
++
+*Note:* The name of `ManagedClusterAddOn` must be `submariner`.
+
+. Repeat steps 2 and 3 for all of the managed clusters that you want to enable Submariner.
+
+. After Submariner is deployed on the managed cluster, you can verify the Submariner deployment status by checking the status of submariner `ManagedClusterAddOn` by entering the following command: 
++
+----
+oc -n <managed-cluster-name> get managedclusteraddons submariner -oyaml
+----
++
+Replace `managed-cluster-name` with the name of the managed cluster.
++
+In the status of the Submariner `ManagedClusterAddOn`, three conditions indicate the  deployment status of Submariner:
++
+* `SubmarinerGatewayNodesLabeled` condition indicates whether there are labeled Submariner gateway nodes on the managed cluster.
+* `SubmarinerAgentDegraded` condition indicates whether the Submariner is successfully deployed on the managed cluster.
+* `SubmarinerConnectionDegraded` condition indicates how many connections are established on the managed cluster with Submariner.
