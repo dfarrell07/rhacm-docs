@@ -40,67 +40,71 @@ Replace `BMC-address-range/CIDR` with the BMC address and the number of addresse
 +
 After you add the previous values, the settings are applied to your clusters. 
 
-. Provision the cluster by completing the procedure for creating a cluster. See xref:../clusters/create.adoc#creating-a-cluster[Creating a cluster] to select your provider.
+. Provision the cluster by completing the procedure for creating a cluster. See xref:../multicluster_engine/create.adoc#creating-a-cluster[Creating a cluster] to select your provider.
 
-[#enable-cluster-wide-proxy-existing]
-== Enabling cluster-wide proxy on an existing cluster
+[#enable-cluster-wide-proxy-addon]
+== Enabling cluster-wide proxy on existing cluster add-ons
 
-When you enable the cluster-wide proxy feature, you have to make the components of the managed cluster aware so they can work behind the proxy. To enable the components, such as Application Manager, the operator pods are updated with the following environment variables: `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY`. 
+You can configure the `KlusterletAddonConfig` in the cluster namespace to add the proxy environment variables to all of the klusterlet add-on pods of the {ocp} clusters that are managed by the hub cluster.
 
-These environment variables specify where the pod routes the `HTTP` and `HTTPS` traffic to the proxy server. The operator pods are automatically updated with these environment variables, so the standalone subscriptions work after enabling the cluster-wide proxy. 
+Complete the following steps to configure the `KlusterletAddonConfig` to add the 3 environment variables to the pods of the klusterlet add-ons:
 
-On existing managed clusters, the `subscription controller` runs inside of a `klusterlet add-on`. The environment variables are not automatically added when it creates the pods. You must manually add the environment variables to an existing cluster by patching the deployment and adding three environment variables to each container in the deployment. 
+. Open the `KlusterletAddonConfig` file that is in the namespace of the cluster that needs the proxy added.
 
-Complete the following steps to add the environment variables to the `klusterlet add-on` for `appmgr`:
-
-. Enter the following command to create the HTTP proxy: 
+. Edit the `.spec.proxyConfig` section of the file so it resembles the following example:
 +
+[source,yaml]
 ----
-kubectl patch deployment <deployment-name> -p '{"spec":{"template":{"spec":{"containers":[{"env":[{"name":"HTTP_PROXY","value":"'<http-proxy>'"}],"name":"'<container-name>'"}]}}}}'
-----
-+
-Replace `deployment-name` with the name of the deployment.
-+
-Replace `http-proxy` with the address of the proxy server that you want to use for http requests. For example, `http://192.168.1.1:3128`.
-+
-Replace `container-name` with the name of the container.
-
-. Enter the following command to create the HTTPS proxy: 
-+
-----
-kubectl patch deployment <deployment-name> -p '{"spec":{"template":{"spec":{"containers":[{"env":[{"name":"HTTPS_PROXY","value":"'<https-proxy>'"}],"name":"'<container-name>'"}]}}}}'
+spec
+  proxyConfig:
+    httpProxy: "<proxy_not_secure>"
+    httpsProxy: "<proxy_secure>" 
+    noProxy: "<no_proxy>" 
 ----
 +
-Replace `deployment-name` with the name of the deployment.
+Replace `proxy_not_secure` with the address of the proxy server for `http` requests. For example, `http://192.168.123.145:3128`.
 +
-Replace `https-proxy` with the address of the proxy server that you want to use for https requests. For example, `http://192.168.1.0:3128`.
+Replace `proxy_secure` with the address of the proxy server for `https` requests. For example, `https://192.168.123.145:3128`. 
 +
-Replace `container-name` with the name of the container.
+Replace `no_proxy` with a comma delimited list of IP addresses, hostnames, and domain names where traffic will not be routed through the proxy. For example, `.cluster.local,.svc,10.128.0.0/14,example.com`.
++
+The `spec.proxyConfig` is an optional section. If the {ocp-short} cluster is created with cluster wide proxy configured on the {product-title-short} hub cluster, the cluster wide proxy configuration values are added to the pods of the klusterlet add-ons as environment variables when the following conditions are met:
++
+* The `.spec.policyController.proxyPolicy` in the `addon` section is enabled and set to `OCPGlobalProxy`
 
-. Enter the following command to specify what does not pass through the proxy: 
+* The `.spec.applicationManager.proxyPolocy` is enabled and set to `CustomProxy`.
 +
+**Note:** The default value of `proxyPolicy` in the `addon` section is `Disabled`.
++
+See the following example:
++
+[source,yaml]
 ----
-kubectl patch deployment <deployment-name> -p '{"spec":{"template":{"spec":{"containers":[{"env":[{"name":"NO_PROXY","value":"'<no-proxy>'"}],"name":"'<container-name>'"}]}}}}'
+apiVersion: agent.open-cluster-management.io/v1
+    kind: KlusterletAddonConfig
+    metadata:
+      name: clusterName
+      namespace: clusterName
+    spec:
+      proxyConfig:
+        httpProxy: http://pxuser:12345@10.0.81.15:3128
+        httpsProxy: http://pxuser:12345@10.0.81.15:3128
+        noProxy: .cluster.local,.svc,10.128.0.0/14, example.com
+      applicationManager:
+        enabled: true
+        proxyPolicy: CustomProxy
+      policyController:
+        enabled: true
+        proxyPolicy: OCPGlobalProxy
+      searchCollector:
+        enabled: true
+        proxyPolicy: Disabled
+      certPolicyController:
+        enabled: true
+        proxyPolicy: Disabled
+      iamPolicyController:
+        enabled: true
+        proxyPolicy: Disabled
 ----
-+
-Replace `deployment-name` with the name of the deployment.
-+
-Replace `no-proxy` with the comma delimited list of IPs, hostnames, and domains where traffic will not be routed through the proxy. For example, `.cluster.local,.svc,10.128.0.0/14, example.com`.
-+
-Replace `container-name` with the name of the container.
 
-*Tip:* For several containers, you can create and run a file that resembles the following example on each of the containers:
-
-----
-DEPLOYMENT_NAME="klusterlet-addon-appmgr"
-CONTAINER_NAME="subscription-controller"
-HTTP_PROXY="http://192.168.1.1:3128"
-HTTPS_PROXY="http://192.168.1.0:3128"
-NO_PROXY=".cluster.local,.svc,10.128.0.0/14, example.com"
-
-kubectl patch deployment $DEPLOYMENT_NAME -p '{"spec":{"template":{"spec":{"containers":[{"env":[{"name":"HTTP_PROXY","value":"'$HTTP_PROXY'"}],"name":"'$CONTAINER_NAME'"}]}}}}'
-
-kubectl patch deployment $DEPLOYMENT_NAME -p '{"spec":{"template":{"spec":{"containers":[{"env":[{"name":"HTTPS_PROXY","value":"'$HTTPS_PROXY'"}],"name":"'$CONTAINER_NAME'"}]}}}}'
-
-kubectl patch deployment $DEPLOYMENT_NAME -p '{"spec":{"template":{"spec":{"containers":[{"env":[{"name":"NO_PROXY","value":"'$NO_PROXY'"}],"name":"'$CONTAINER_NAME'"}]}}}}'
-----
+Proxy is configured on your cluster add-ons. 

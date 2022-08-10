@@ -38,7 +38,7 @@ Cannot delete MultiClusterHub resource because ManagedCluster resource(s) exist
 ----
 
 +
-For more information about detaching clusters, see the _Removing a cluster from management_ section by selecting the information for your provider in link:../clusters/create.adoc#creating-a-cluster[Creating a cluster]. 
+For more information about detaching clusters, see the _Removing a cluster from management_ section by selecting the information for your provider in link:../multicluster_engine/create.adoc#creating-a-cluster[Creating a cluster]. 
 
 * If you have Bare metal assets, you might see the following:
 
@@ -83,7 +83,7 @@ When you delete the resource, the pods in the `open-cluster-management-observabi
 [#removing-a-multiclusterhub-instance-by-using-commands]
 == Removing resources by using commands
 
-. If you have not already. ensure that your {ocp-short} CLI is configured to run `oc` commands. See https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/cli_tools/openshift-cli-oc#cli-getting-started[Getting started with the OpenShift CLI] in the {ocp-short} documentation for more information about how to configure the `oc` commands. 
+. If you have not already. ensure that your {ocp-short} CLI is configured to run `oc` commands. See https://access.redhat.com/documentation/en-us/openshift_container_platform/4.11/html/cli_tools/openshift-cli-oc#cli-getting-started[Getting started with the OpenShift CLI] in the {ocp-short} documentation for more information about how to configure the `oc` commands. 
 
 . Change to your project namespace by entering the following command. Replace _namespace_ with the name of your project namespace:
 +
@@ -103,7 +103,7 @@ You can view the progress by entering the following command:
 oc get mch -o yaml
 ----
 
-. Remove any potential remaining artifacts by running the clean-up script. 
+. Remove any potential remaining artifacts by running the clean-up script. Run this clean-up script if you plan to reinstall with an older version of {product-title-short} on the same cluster. 
 
 .. Install the Helm CLI binary version 3.2.0, or later, by following the instructions at https://helm.sh/docs/intro/install/[Installing Helm].
 
@@ -118,7 +118,7 @@ oc delete apiservice v1beta2.webhook.certmanager.k8s.io v1.admission.cluster.ope
 oc delete clusterimageset --all
 oc delete configmap -n $ACM_NAMESPACE cert-manager-controller cert-manager-cainjector-leader-election cert-manager-cainjector-leader-election-core
 oc delete consolelink acm-console-link
-oc delete crd klusterletaddonconfigs.agent.open-cluster-management.io placementbindings.policy.open-cluster-management.io policies.policy.open-cluster-management.io userpreferences.console.open-cluster-management.io searchservices.search.acm.com 
+oc delete crd klusterletaddonconfigs.agent.open-cluster-management.io placementbindings.policy.open-cluster-management.io policies.policy.open-cluster-management.io userpreferences.console.open-cluster-management.io searchservices.search.acm.com discoveredclusters.discovery.open-cluster-management.io discoveryconfigs.discovery.open-cluster-management.io 
 oc delete mutatingwebhookconfiguration cert-manager-webhook cert-manager-webhook-v1alpha1 ocm-mutating-webhook managedclustermutators.admission.cluster.open-cluster-management.io 
 oc delete oauthclient multicloudingress
 oc delete rolebinding -n kube-system cert-manager-webhook-webhook-authentication-reader
@@ -143,7 +143,7 @@ advanced-cluster-management.v2.4.0   Advanced Cluster Management for Kubernetes 
 
 ❯ oc get sub
 NAME                        PACKAGE                       SOURCE                CHANNEL
-acm-operator-subscription   advanced-cluster-management   acm-custom-registry   release-2.4
+acm-operator-subscription   advanced-cluster-management   acm-custom-registry   release-2.5
 
 ❯ oc delete sub acm-operator-subscription
 ----

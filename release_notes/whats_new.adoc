@@ -23,75 +23,37 @@ Learn more about what is new this release:
 
 [#web-console-whats-new]
 == Web console
-
-The changes to the side-bar navigation align with other products and offer a better user experience. From the navigation, you can access various product features. 
+Learn more in the link:../console/console.adoc#console-overview[Console overview].
 
 [#observability-whats-new]
 === Observability
 
-* Add recording rules in the observability service to calculate the Kubernetes API server service-level indicator (SLI) and service-level objective (SLO). For more details, see link:../observability/customize_observability.adoc#creating-custom-rules[Creating custom rules].
-
-* You can now view an aggregate of clusters within a fleet for the service-level overview for the Kubernetes API server from the Grafana dashboard. See link:../observability/customize_observability.adoc#viewing-cluster-fleet-service-level-overview-on-k8s-api-server-grafana[Viewing the cluster fleet service-level overview for the Kubernetes API server dashboard].
-
-* View the error budget and time remaining within a seven or 30-day period from the Grafana dashboard, where the service can utilize downtime in the cluster service-level overview for the Kubernetes API server. See link:../observability/customize_observability.adoc#viewing-cluster-service-level-overview-on-k8s-api-server-grafana[Viewing the cluster service-level overview for the Kubernetes API server dashboard].
-
-* Use {product-title-short} with Grafana 8.1.3 to view metrics. See link:../observability/observe_environments.adoc#observing-environments[Observing environments] for more information.
-
-* View the cluster service-level overview for the Kubernetes API server from the Grafana dashboard. See link:../observability/customize_observability.adoc#viewing-cluster-service-level-overview-on-k8s-api-server-grafana[Viewing the cluster service-level overview for the Kubernetes API server dashboard].
-
 [#cluster-whats-new]
 == Clusters
 
-* You can now host {ocp-short} hub clusters on the following platforms, as well as manage clusters that are provisioned on these platforms:
-** IBM Z and LinuxONE
-** IBM Power systems
+* The _multicluster engine operator_ is generally available as a software operator that enhances cluster fleet management. The multicluster engine operator supports {ocp} and Kubernetes cluster lifecycle management across clouds and data centers. {ocp} is a prerequisite for the multicluster engine operator. 
 
-* Create and manage a Microsoft Azure Government cluster using the {product-title-short} console. See link:../credentials/credential_azure.adoc#creating-a-credential-for-microsoft-azure[Creating a credential for Microsoft Azure] for more information. 
+*Technology Preview:* 
 
-* Create infrastructure environments to manage your on-premises clusters. See link:../clusters/create_infra_env.adoc#creating-an-infrastructure-environment[Creating an infrastructure environment] for more information.  
+See the following cluster features that are available as Technology Preview:
 
-* Create on-premises clusters in an infrastructure environment with the {product-title-short} console. See link:../clusters/create_cluster_on_prem.adoc#creating-a-cluster-on-premises[Creating a cluster in an on-premises environment] for more information. 
-
-* Select your managed clusters based on the status of the add-ons. See link:../clusters/placement_managed.adoc#addon-status[Add-on status] for more information.
-
-* You can now configure the proxy information for your cluster with the {product-title-short} console when you create a cluster. See the creation topic of the cluster that you are creating in link:../clusters/create.adoc#creating-a-cluster[Creating a cluster] for more information.   
-
-*Technology Preview:*
-
-* Use the cluster backup and restore operator to schedule back up and restore for your cluster resources. See link:../clusters/backup_and_restore.adoc#hub-backup-and-restore[Cluster backup and restore operator (Technology Preview)] for more information.
-
-* Deploy multiple SNO clusters using zero touch provisioning. See https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/scalability_and_performance/ztp-deploying-disconnected[Deploying distributed units at scale in a disconnected environment] in the {ocp-short} documentation for more information. 
-
-* Replicate persistent volume using VolSync, which enables you to create copies of the data on a persistent volume. See link:../clusters/volsync.adoc#volsync[Replicating persistent volumes with VolSync] for more information. 
-
+For other Clusters topics, see link:../clusters/intro.adoc#managing-your-clusters[Managing your clusters].
+  
 [#application-whats-new]
 == Applications
 
-Choose a type of application to create from the Application console `Create application` drop-down menu. You have the option to create a Git repository, Helm repository, or Object Storage repository Subscription. Subscriptions are Kubernetes resources within channels (source repositories).
-
-*Technology Preview:* You can now also choose to create an Argo CD ApplicationSet from the same drop-down menu so that you can manage Argo CD Applications across a larger amount of clusters.
-
-With the YAML Editor on, you can see the file update as you create or edit your applications as you modify the fields.
-
-You can specify the secondary channel when you create an application, or after. When you create the secondary channel, the application uses the secondary when the primary fails.
-
-As a subscription administrator, you can create an allow and deny list. In the same role, you can also now deploy all application resources into the subscription namespace. See link:../applications/app_advanced_config.adoc#application-advanced-configuration[Application advanced configuration] for more information about subscription administrator tasks and other advanced configuration topics.
-
-For other Application topics, see link:..//applications/app_management_overview.adoc[Managing applications].
+For other Application topics, see link:../applications/app_management_overview.adoc[Managing applications].
 
 [#governance-whats-new]
 == Governance
 
-* You can use new columns that are displayed from the _Governance_ page. Use the _Source_ column from the console to identify policies that are deployed using GitOps. Use the _Status_ column to verify the enablement of a policy. For more information, see link:../governance/manage_policy_overview.adoc#manage-security-policies[Manage security policies].
+* You can use the `configurationPolicyAnnotations` parameter in the policy generator configuration to specify key-value pair annotations on generated configuration policies. See link:../governance/policy_generator.adoc#policy-gen-yaml-table[Policy generator configuration reference table] for more details.
 
-* You can now use {product-title-short} clusters that are FIPS ready. For more details, see xref:..release_notes/fips_readiness.adoc#fips-readiness[FIPS readiness].
-
-* Use the integration of Red Hat Insights and governance to send alerts for governance violations. You can also identify which component sent the violation. See link:../governance/grc_insights.adoc#manage-insights[Managing insight PolicyReports] for more information.
-
-* Customize your dashboard with new filtering options that support bulk actions. See link:../governance/manage_policy_overview.adoc#customize-grc-view[Customize the Governance page] for more information.
-
-* Use the `policy_governance_info` metric to view trends and analyze any policy failures. See link:../governance/policy_governance_info.adoc#gov-metric[Governance metric] for more details.
+* Configure the concurrency of the configuration policy controller for each managed cluster to change how many configuration policies it can evaluate at the same time. See link:../governance/config_policy_ctrl.adoc#configuring-the-configuration-policy-controller[Configuring the configuration policy controller] for more details.
 
 See link:../governance/grc_intro.adoc#governance[Governance] to learn more about the dashboard and the policy framework.
+
+[#add-on-whats-new]
+== Add-ons
 
 To see more release note topics, go to the xref:../release_notes/release_notes.adoc#red-hat-advanced-cluster-management-for-kubernetes-release-notes[Release notes].

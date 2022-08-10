@@ -1,7 +1,7 @@
 [#observing-environments]
 = Observing environments
 
-You can use {product-title} to gain insight and optimize your managed clusters. Enable the observability service operator, `multicluster-observability-operator`, to monitor the health of your managed clusters. Learn about the architecture for the multicluster observability service in the following sections. 
+You can use {product-title} to gain insight and optimize your managed clusters. Enable the observability service operator, `multicluster-observability-operator`, on your hub cluster to monitor the health of your managed clusters. Learn about the architecture for the multicluster observability service in the following sections. 
 
 image:../images/observability-arch-24.png[Multicluster observability architecture]
 
@@ -29,11 +29,9 @@ By default, observability is included with the product installation, but not ena
 
 When the service is enabled, the `observability-endpoint-operator` is automatically deployed to each imported or created cluster. This controller collects the data from {ocp} Prometheus, then sends it to the {product-title-short} hub cluster. 
 
-When observability is enabled in a hub cluster, metrics are collected by handling the hub cluster as a managed cluster called `local-cluster`.
-  
-*Note*: In {product-title-short} the `metrics-collector` is only supported for {ocp} 4.x clusters. 
+If the hub cluster imports itself as the `local-cluster`, observability is also enabled on it and metrics are collected from the hub cluster.
 
-The observability service deploys an instance of Prometheus AlertManager, which enables alerts to be forwarded with third-party applications. It also includes an instance of Grafana to enable data visualization with dashboards (static) or data exploration. {product-title-short} supports version 8.1.3 of Grafana. You can also design your Grafana dashboard. For more information, see xref:../observe_environments/design_grafana.adoc#designing-your-grafana-dashboard[Designing your Grafana dashboard].
+The observability service deploys an instance of Prometheus AlertManager, which enables alerts to be forwarded with third-party applications. It also includes an instance of Grafana to enable data visualization with dashboards (static) or data exploration. {product-title-short} supports version 8.1.3 of Grafana. You can also design your Grafana dashboard. For more information, see xref:../observability/design_grafana.adoc#designing-your-grafana-dashboard[Designing your Grafana dashboard].
 
 You can customize the observability service by creating custom https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/[recording rules] or https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/[alerting rules].
 
@@ -44,7 +42,29 @@ For more information about enabling observability, see xref:../observability/obs
 
 By default, {ocp-short} sends metrics to Red Hat using the Telemetry service. The `acm_managed_cluster_info` is available with {product-title-short} and is included with telemetry, but is _not_ displayed on the {product-title-short} _Observe environments overview_ dashboard.
 
-Learn from the {ocp-short} documentation what types of metrics are collected and sent using telemetry. See https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html-single/support/index#about-remote-health-monitoring[Information collected by Telemetry] for information. 
+View the following table of metric types that are supported by the framework:
+
+.Parameter table
+|===
+| Metric name | Metric type | Labels/tags | Status
+
+| `acm_managed_cluster_info`
+| Gauge
+| `hub_cluster_id`, `managed_cluster_id`, `vendor`, `cloud`, `version`, `available`, `created_via`, `core_worker`, `socket_worker`
+| Stable
+
+| `policy_governance_info`
+| Gauge
+| `type`, `policy`, `policy_namespace`, `cluster_namespace`
+| Stable. See link:../governance/policy_governance_info.adoc#gov-metric[Governance metric] for more details.
+
+| `policyreport_info`
+| Gauge
+| `managed_cluster_id`, `category`, `policy`, `result`, `severity`
+| Stable. See xref:../observability/manage_insights.adoc#manage-insights[Managing insight PolicyReports] for more details.
+|===
+
+Learn from the {ocp-short} documentation what types of metrics are collected and sent using telemetry. See https://access.redhat.com/documentation/en-us/openshift_container_platform/4.11/html-single/support/index#about-remote-health-monitoring[Information collected by Telemetry] for information. 
 
 [#observability-pod-capacity-requests]
 == Observability pod capacity requests
@@ -222,7 +242,7 @@ Observability components require 2701mCPU and 11972Mi memory to install the obse
 [#persistent-stores-observability]
 == Persistent stores used in the observability service
 
-When you install {product-title-short} the following persistent volumes are created:
+When you install {product-title-short} the following persistent volumes (PV) must be created so that Persistent Volume Claims (PVC) can attach to it automatically. As a reminder, you must define a storage class in the `MultiClusterObservability` CR when there is no default storage class specified or you want to use a non-default storage class to host the PVs. It is recommended to use Block Storage, similare to what Prometheus uses. Also each replica of `alertmanager`, `thanos-compactor`, `thanos-ruler`, `thanos-receive-default` and `thanos-store-shard` must have its own PV. View the following table:
 
 .Table list of persistent volumes
 |===

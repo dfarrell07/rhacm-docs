@@ -33,6 +33,7 @@ The following YAML structure shows the required fields for a placement rule and 
 ----
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
+metadata:
   name:
   namespace:
   resourceVersion:
@@ -84,6 +85,9 @@ spec:
 | Optional. The labels for identifying the target clusters
 
 | spec.clusterSelector.matchLabels
+| Optional. The labels that must exist for the target clusters.
+
+| spec.clusterSelector.matchExpressions
 | Optional. The labels that must exist for the target clusters.
 
 | status.decisions
@@ -192,3 +196,4 @@ spec:
       values:
       - dev
 ----
+//that is already here, no?

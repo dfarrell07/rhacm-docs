@@ -9,6 +9,8 @@ For more information about CRDs, see https://kubernetes.io/docs/tasks/access-kub
 The configuration policy controller is created on the hub cluster during installation.
 Configuration policy controller supports the `enforce` feature and monitors the compliance of the following policies:
 
+//create an issue to create a table with brief descriptions instead of this bulleted list
+
 * xref:../governance/memory_policy.adoc#memory-usage-policy[Memory usage policy]
 * xref:../governance/namespace_policy.adoc#namespace-policy[Namespace policy]
 * xref:../governance/image_vuln_policy.adoc#image-vulnerability-policy[Image vulnerability policy]
@@ -38,7 +40,7 @@ Name:         configuration-policy-example
 Namespace:
 Labels:
 APIVersion:   policy.open-cluster-management.io/v1
-Kind:         ConfigPolicy
+Kind:         ConfigurationPolicy
 Metadata:
   Finalizers:
     finalizer.policy.open-cluster-management.io
@@ -64,7 +66,7 @@ Spec:
 [source,yaml]
 ----
 apiVersion: policy.open-cluster-management.io/v1
-kind: ConfigPolicy
+kind: ConfigurationPolicy
 metadata:
   name: policy-config
 spec:
@@ -86,7 +88,9 @@ spec:
             name: 
             ports:
            - containerPort: 80
-
+  evaluationInterval:
+    compliant:
+    noncompliant:
 ----
 
 [#configuration-policy-yaml-table]
@@ -102,7 +106,7 @@ Set the value to `policy.open-cluster-management.io/v1`.
 
 | kind
 | Required.
-Set the value to `ConfigPolicy` to indicate the type of policy.
+Set the value to `ConfigurationPolicy` to indicate the type of policy.
 
 | metadata.name
 | Required. The name of the policy.
@@ -130,8 +134,36 @@ The `exclude` parameter specifies the namespaces you explicitly do not want to a
 `musthave`: Indicates an object must exist with the same name as specified object-template. The other fields in the template are a subset of what exists in the object.
 
 `mustnothave`: Indicated that an object with the same name or labels cannot exist and need to be deleted, regardless of the specification or rules.
+
+| spec.evaluationInterval.compliant
+| Optional. Used to define how often the policy is evaluated when it is in the compliant state. The values must be in the format of a duration which is a sequence of numbers with time unit suffixes. For example, `12h30m5s` represents 12 hours, 30 minutes, and 5 seconds. It can also be set to `never` so that the policy is not reevaluated on the compliant cluster, unless the policy `spec` is updated.
+
+| spec.evaluationInterval.noncompliant
+| Optional. Used to define how often the policy is evaluated when it is in the non-compliant state. Similar to the `evaluationInterval.compliant` parameter, the values must be in the format of a duration which is a sequence of numbers with time unit suffixes. It can also be set to `never` so that the policy is not reevaluated on the noncompliant cluster, unless the policy `spec` is updated.
 |===
 
 See the policy samples that use https://nvd.nist.gov/800-53/Rev4/control/CA-1[NIST Special Publication 800-53 (Rev. 4)], and are supported by {product-title-short} from the https://github.com/stolostron/policy-collection/tree/main/stable/CM-Configuration-Management[`CM-Configuration-Management` folder]. Learn about how policies are applied on your hub cluster, see xref:../governance/policy_sample_intro.adoc#supported-policies[Supported policies] for more details. 
 
 Learn how to create and customize policies, see xref:../governance/manage_policy_overview.adoc#manage-security-policies[Manage security policies]. Refer to xref:../governance/policy_controllers.adoc#policy-controllers[Policy controllers] for more details about controllers.
+
+[#configuration-config-policy-controller]
+== Configuring the configuration policy controller
+
+You can configure the concurrency of the configuration policy controller per managed cluster to change how many configuration policies it can evaluate at the same time. To change the default value of `2`, set the `policy-evaluation-concurrency` annotation with a non-zero integer within quotes. You can set the value on the `ManagedClusterAddOn` object called `config-policy-controller` in the managed cluster namespace of the hub.
+
+*Note*: Higher concurrency values increase CPU and memory utilization on the `config-policy-controller` pod, Kubernetes API server, and OpenShift API server.
+
+In the following YAML example, concurrency is set to `5` on the managed cluster called `cluster1`:
+
+[source,yaml]
+----
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: ManagedClusterAddOn
+metadata:
+  name: config-policy-controller
+  namespace: cluster1
+  annotations:
+    policy-evaluation-concurrency: "5"
+spec:
+  installNamespace: open-cluster-management-agent-addon
+----

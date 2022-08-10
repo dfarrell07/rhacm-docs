@@ -1,7 +1,7 @@
 [#role-based-access-control]
 = Role-based access control
 
-{product-title} supports role-based access control (RBAC). Your role determines the actions that you can perform. RBAC is based on the authorization mechanisms in Kubernetes, similar to {ocp}. For more information about RBAC, see the OpenShift _RBAC_ overview in the https://docs.openshift.com/container-platform/4.9/authentication/using-rbac.html[{ocp-short} documentation].
+{product-title} supports role-based access control (RBAC). Your role determines the actions that you can perform. RBAC is based on the authorization mechanisms in Kubernetes, similar to {ocp}. For more information about RBAC, see the OpenShift _RBAC_ overview in the https://docs.openshift.com/container-platform/4.11/authentication/using-rbac.html[{ocp-short} documentation].
 
 *Note*: Action buttons are disabled from the console if the user-role access is impermissible.
 
@@ -318,7 +318,7 @@ The access to credentials is controlled by Kubernetes. Credentials are stored an
 [#application-lifecycle-RBAC]
 === Application lifecycle RBAC
 
-When you create an application, the `_subscription_` namespace is created and the configuration map is created in the `_subscription_` namespace. You must also have access to the `_channel_` namespace. When you want to apply a subscription, you must be a subscription administrator. For more information on managing applications, see link:../applications/managing_subscriptions.adoc#creating-and-managing-subscriptions[Creating and managing subscriptions]. 
+When you create an application, the `_subscription_` namespace is created and the configuration map is created in the `_subscription_` namespace. You must also have access to the `_channel_` namespace. When you want to apply a subscription, you must be a subscription administrator. For more information on managing applications, see link:../applications/allow_deny.adoc#creating-allow-deny-list[Creating an allow and deny list as subscription administrator]. 
 
 View the following application lifecycle RBAC operations:
 
@@ -539,11 +539,34 @@ View the following console and API RBAC tables for governance lifecycle:
 [#observability-RBAC]
 === Observability RBAC
 
-To use the observability features, you must be assigned the `cluster-admin` or the `open-cluster-management:cluster-manager-admin` role. View the following list of observability features:
+To view the observability metrics for a managed cluster, you must have `view` access to that managed cluster on the hub cluster. View the following list of observability features:
 
-//To access the managed cluster metrics run the following command:
 * Access managed cluster metrics.
++
+Users are denied access to managed cluster metrics, if they are not assigned to the `view` role for the managed cluster on the hub cluster.
 * Search for resources.
+
+To view observability data in Grafana, you must have a `RoleBinding` resource in the same namespace of the managed cluster. View the following `RoleBinding` example:
+
+[source,yaml]
+----
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: <replace-with-name-of-rolebinding>
+ namespace: <replace-with-name-of-managedcluster-namespace>
+subjects:
+ - kind: <replace with User|Group|ServiceAccount>
+   apiGroup: rbac.authorization.k8s.io
+   name: <replace with name of User|Group|ServiceAccount>
+roleRef:
+ apiGroup: rbac.authorization.k8s.io
+ kind: ClusterRole
+ name: view
+----
+
+See link:../governance/rolebinding_policy.adoc#role-binding-policy[Role binding policy] for more information. See link:../observability/customize_observability.adoc#customizing-observability[Customizing observability] to configure observability.
+
 
 To manage components of observability, view the following API RBAC table:
 

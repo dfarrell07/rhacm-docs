@@ -1,0 +1,18 @@
+[#submariner-deploy-over]
+= Deploying Submariner
+
+You can deploy Submariner to network clusters on the following providers: 
+
+Automatic deployment process:
+ 
+* Amazon Web Services
+* Google Cloud Platform
+* Red Hat OpenStack Platform
+* Microsoft Azure
+
+Manual deployment process:
+
+* IBM Cloud
+* VMware vSphere
+* Bare metal
+
