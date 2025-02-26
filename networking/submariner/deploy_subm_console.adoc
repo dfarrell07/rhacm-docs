@@ -3,17 +3,22 @@
 
 Before you deploy Submariner with {acm}, you must prepare the clusters on the hosting environment. You can use the `SubmarinerConfig` API or the {acm} console to automatically prepare {ocp} clusters on the following providers:
 
-* Amazon Web Services
-* Bare Metal with hosted control planes (Technology Preview)
+* Red Hat OpenShift Container Platform (RHOCP)
+* RHOCP on IBM Cloud (RHOIC) (tech preview)
+* Microsoft Azure Red Hat OpenShift (ARO)
+* Red Hat OpenShift Service on AWS (ROSA)
+* RHOCP on bare metal (tech preview)
+* RHOCP on VMware vSphere
+* RHOCP on Red Hat OpenStack Platform (RHOSP)
+* RHOCP on IBM Power Systems (tech preview)
+* Red Hat OpenShift Kubernetes Engine
+
+Not listed on support matrix but should be?
+
 * Google Cloud Platform
 * IBM Power Systems Virtual Server
-* Red Hat OpenShift on IBM Cloud (Technology Preview)
-* Red Hat OpenStack Platform
-* Red Hat OpenShift Service on AWS with hosted control planes (Technology Preview)
 * Red Hat OpenShift Virtualization (Technology Preview)
 * Red Hat OpenShift Virtualization with hosted control planes (Technology Preview)
-* Microsoft Azure
-* VMware vSphere
 
 *Notes:*
 
